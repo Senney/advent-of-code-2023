@@ -47,12 +47,18 @@ fn get_calibration_value(
     match (number, d) {
         (None, _) => {
             let new_accumulator = format!("{}{}", acc, &line[0..1]);
-            get_calibration_value(&line[1..], valid_digit_words, Some(&new_accumulator), Some(d))
+            get_calibration_value(
+                &line[1..],
+                valid_digit_words,
+                Some(&new_accumulator),
+                Some(d),
+            )
         }
         (Some(num), true) => num as i32,
         (Some(num), false) => {
             let reversed = line.chars().rev().collect::<String>();
-            (num as i32 * 10) + get_calibration_value(&reversed, valid_digit_words, Some(""), Some(true))
+            (num as i32 * 10)
+                + get_calibration_value(&reversed, valid_digit_words, Some(""), Some(true))
         }
     }
 }
@@ -83,7 +89,6 @@ fn main() {
 
     let mut r = 0;
     for line in contents {
-
         let cv = get_calibration_value(line, &valid_digit_words, None, None);
 
         r = r + cv;
