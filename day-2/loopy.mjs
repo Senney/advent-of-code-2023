@@ -10,6 +10,20 @@ const parseDraw = (draw) => {
   );
 };
 
+const minPresentInDraws = (draws) => {
+  const m = {};
+
+  draws.forEach((d) => {
+    const entries = Object.entries(d);
+
+    entries.forEach((e) => {
+      m[e[0]] = Math.max(m[e[0]] ?? 0, e[1]);
+    });
+  });
+
+  return m;
+};
+
 const parseLine = (input) => {
   const colonIndex = input.indexOf(':');
   if (!colonIndex) {
@@ -19,11 +33,13 @@ const parseLine = (input) => {
   const draws = input
     .slice(colonIndex + 1)
     .split('; ')
-    .map((draw) => draw.trim().split(', '));
+    .map((draw) => draw.trim().split(', '))
+    .map((d) => parseDraw(d));
 
   return {
     game: Number.parseInt(input.slice(4, colonIndex)),
-    draws: draws.map((d) => parseDraw(d)),
+    draws: draws,
+    minRequired: minPresentInDraws(draws),
   };
 };
 
@@ -41,13 +57,10 @@ const solve = async () => {
   for (const line of l) {
     const game = parseLine(line);
 
-    const isValid = game.draws.every(
-      (d) => validAmount(r, d.r) && validAmount(g, d.g) && validAmount(b, d.b)
-    );
+    const powerSet =
+      game.minRequired.r * game.minRequired.b * game.minRequired.g;
 
-    if (isValid) {
-      t += game.game;
-    }
+    t += powerSet;
   }
 
   console.log(t);
